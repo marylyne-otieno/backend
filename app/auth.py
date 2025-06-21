@@ -30,10 +30,13 @@ class Register(Resource):
 class Login(Resource):
     def post(self):
         data = request.get_json(force=True)
-        username = data.get("username")
+        username_or_email = data.get("username") or data.get("email")
         password = data.get("password")
 
-        user = User.query.filter_by(username=username).first()
+        user = User.query.filter(
+            (User.username == username_or_email) | (User.email == username_or_email)
+        ).first()
+
         if user and user.check_password(password):
             token = create_access_token(identity=user.username)
             return {"access_token": token}, 200
