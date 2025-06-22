@@ -21,7 +21,45 @@ def create_app():
     jwt.init_app(app)
     migrate.init_app(app, db)
 
-    
+    CORS(app, resources={r"/*": {"origins": [
+        "http://localhost:5173",
+        "https://your-frontend.onrender.com"
+    ]}}, supports_credentials=True)
+
+    from . import models
+    from .resources import register_resources
+    from .auth import register_user_resources
+
+    api = Api(app)
+    register_resources(api)
+    register_user_resources(api)
+    print("Registered /register and /login endpoints")
+
+    return app
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+'''
+def create_app():
+    app = Flask(__name__)
+    app.config.from_object('config.Config')
+
+    db.init_app(app)
+    jwt.init_app(app)
+    migrate.init_app(app, db)
+
+
     CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 
     from . import models
@@ -31,5 +69,9 @@ def create_app():
     api = Api(app)
     register_resources(api)
     register_user_resources(api)
+    print("Registered /register and /login endpoints")  # Debug log
 
     return app
+
+'''
+

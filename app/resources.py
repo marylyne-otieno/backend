@@ -10,6 +10,7 @@ user_parser.add_argument('email', required=True, help="Email is required")
 
 
 # USERS Resource
+'''
 class UserListResource(Resource):
 
     def get(self):
@@ -37,6 +38,49 @@ class UserListResource(Resource):
         user = User(username=args["username"], email=args["email"])
         db.session.add(user)
         db.session.commit()
+        return {'id': user.id, 'message': "User created successfully"}, 201
+
+
+
+'''
+
+class UserListResource(Resource):
+    def get(self):
+        users = User.query.all()
+        users_list = []
+
+        for user in users:
+            users_list.append({
+                "id": user.id,
+                "username": user.username,
+                "email": user.email,
+                "profile": user.profile.bio if user.profile else None,
+                "posts": [
+                    {
+                        "id": post.id,
+                        "title": post.title,
+                        "content": post.content
+                    } for post in user.posts
+                ]
+            })
+        return jsonify(users_list)
+
+    def post(self):
+        data = request.get_json()
+
+        if not data:
+            return {"error": "Missing JSON in request"}, 400
+
+        username = data.get("username")
+        email = data.get("email")
+
+        if not username or not email:
+            return {"error": "Username and email are required"}, 400
+
+        user = User(username=username, email=email)
+        db.session.add(user)
+        db.session.commit()
+
         return {'id': user.id, 'message': "User created successfully"}, 201
 
 
